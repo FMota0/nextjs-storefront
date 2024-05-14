@@ -40,6 +40,7 @@
     "@mui/material": "^5.10.16",
     "@mui/x-date-pickers": "^5.0.13",
     "@paypal/react-paypal-js": "^8.2.0",
+    "@plasmicapp/loader-nextjs": "^1.0.386",
     "@splidejs/react-splide": "^0.7.12",
     "@tanstack/react-query": "^5.0.0-alpha.68",
     "@tanstack/react-query-devtools": "^5.0.0-alpha.68",

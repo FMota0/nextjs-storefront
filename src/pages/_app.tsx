@@ -12,6 +12,7 @@ import Router from 'next/router'
 import NProgress from 'nprogress'
 
 import { DefaultLayout } from '@/components/layout'
+import DefaultLayoutInner from '@/components/layout/DefaultLayout/DefaultLayoutInner'
 import { RQNotificationContextProvider } from '@/context'
 import createEmotionCache from '@/lib/createEmotionCache'
 import type { NextPageWithLayout } from '@/lib/types'
@@ -32,12 +33,30 @@ Router.events.on('routeChangeStart', () => NProgress.start())
 Router.events.on('routeChangeComplete', () => NProgress.done())
 Router.events.on('routeChangeError', () => NProgress.done())
 
+export function MaybeWrap(props: {
+  children: React.ReactElement
+  cond: boolean
+  wrapper: (children: React.ReactElement) => React.ReactElement
+}) {
+  return (props.cond ? props.wrapper(props.children) : props.children) as React.ReactElement
+}
+
 const App = (props: KiboAppProps) => {
   const { publicRuntimeConfig } = getConfig()
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
   const { siteTitle, defaultTitle, defaultDescription } = publicRuntimeConfig?.metaData || {}
   const getLayout =
-    Component.getLayout ?? ((page) => <DefaultLayout pageProps={pageProps}>{page}</DefaultLayout>)
+    Component.getLayout ??
+    ((page) => (
+      <DefaultLayout pageProps={pageProps}>
+        <MaybeWrap
+          cond={!pageProps.isPlasmicPage}
+          wrapper={(children) => <DefaultLayoutInner {...pageProps}>{children}</DefaultLayoutInner>}
+        >
+          {page}
+        </MaybeWrap>
+      </DefaultLayout>
+    ))
   const pageTitle = `${siteTitle} | ${pageProps?.metaData?.title || defaultTitle}`
   return (
     <CacheProvider value={emotionCache}>
